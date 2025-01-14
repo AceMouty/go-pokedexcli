@@ -6,7 +6,7 @@ import (
 	"strings"
 )
 
-func startRepl(s *bufio.Scanner, paginationCfg *paginationConfig) {
+func startRepl(s *bufio.Scanner, cfg *Config) {
 
 	fmt.Println("Welcome to the Pokedex!")
 	fmt.Println()
@@ -33,7 +33,7 @@ func startRepl(s *bufio.Scanner, paginationCfg *paginationConfig) {
 			continue
 		}
 
-		command.callback(paginationCfg)
+		command.callback(cfg)
 	}
 }
 
@@ -64,7 +64,7 @@ func cleanInput(text string) []string {
 type cliCommand struct {
 	name        string
 	description string
-	callback    func(*paginationConfig) error
+	callback    func(*Config) error
 }
 
 type commandMap = map[string]cliCommand

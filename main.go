@@ -2,17 +2,22 @@ package main
 
 import (
 	"bufio"
+	"github.com/acemouty/pokedexcli/internal/pokeapi"
 	"os"
+	"time"
 )
 
-type paginationConfig struct {
-	next     string
-	previous string
+type Config struct {
+	pokeApiClient pokeapi.Client
+	next          *string
+	previous      *string
 }
 
 func main() {
 	scanner := bufio.NewScanner(os.Stdin)
-	paginationCfg := paginationConfig{next: "", previous: ""}
 
-	startRepl(scanner, &paginationCfg)
+	apiClient := pokeapi.NewClient(5 * time.Second)
+	cfg := Config{pokeApiClient: apiClient}
+
+	startRepl(scanner, &cfg)
 }
