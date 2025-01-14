@@ -16,7 +16,10 @@ type Config struct {
 func main() {
 	scanner := bufio.NewScanner(os.Stdin)
 
-	apiClient := pokeapi.NewClient(5 * time.Second)
+	httpTimeoutDuration := 5 * time.Second
+	cacheInterval := 5 * time.Minute
+
+	apiClient := pokeapi.NewClient(httpTimeoutDuration, cacheInterval)
 	cfg := Config{pokeApiClient: apiClient}
 
 	startRepl(scanner, &cfg)

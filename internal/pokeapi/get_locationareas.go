@@ -8,6 +8,16 @@ import (
 
 func (c *Client) GetLocationAreas(requestUrl *string) (RespLocationAreas, error) {
 
+	if val, ok := c.cache.Get(*requestUrl); ok {
+		locationsResp := RespLocationAreas{}
+		err := json.Unmarshal(val, &locationsResp)
+		if err != nil {
+			return RespLocationAreas{}, err
+		}
+
+		return locationsResp, nil
+	}
+
 	req, err := http.NewRequest("GET", *requestUrl, nil)
 	if err != nil {
 		return RespLocationAreas{}, err
@@ -30,5 +40,6 @@ func (c *Client) GetLocationAreas(requestUrl *string) (RespLocationAreas, error)
 		return RespLocationAreas{}, err
 	}
 
+	c.cache.Add(*requestUrl, jsonData)
 	return locationsResp, nil
 }
