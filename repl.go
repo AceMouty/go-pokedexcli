@@ -27,13 +27,18 @@ func startRepl(s *bufio.Scanner, cfg *Config) {
 		}
 
 		commandname := input_slice[0]
+		args := []string{}
+		if len(input_slice) > 1 {
+			args = input_slice[1:]
+		}
+
 		command, ok := getCommands()[commandname]
 		if !ok {
 			fmt.Println("Unkown command")
 			continue
 		}
 
-		command.callback(cfg)
+		command.callback(cfg, args...)
 	}
 }
 
@@ -64,7 +69,7 @@ func cleanInput(text string) []string {
 type cliCommand struct {
 	name        string
 	description string
-	callback    func(*Config) error
+	callback    func(*Config, ...string) error
 }
 
 type commandMap = map[string]cliCommand
@@ -94,6 +99,12 @@ func getCommands() commandMap {
 		name:        "mapb",
 		description: "displays previous 20 locations",
 		callback:    handleMapbCommand,
+	}
+
+	commands["explore"] = cliCommand{
+		name:        "explore <location_name>",
+		description: "Explore a location",
+		callback:    handleExploreCommand,
 	}
 
 	return commands

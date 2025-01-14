@@ -1,11 +1,21 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"os"
 )
 
-func handleHelpCommand(cfg *Config) error {
+const baseUrl = "https://pokeapi.co/api/v2/location-area/"
+
+func handleExitCommand(cfg *Config, args ...string) error {
+	fmt.Println("Closing the Pokedex... Goodbye!")
+	os.Exit(0)
+
+	return nil
+}
+
+func handleHelpCommand(cfg *Config, args ...string) error {
 	fmt.Println("Usage:")
 	fmt.Print("\n")
 	for _, command := range getCommands() {
@@ -17,17 +27,8 @@ func handleHelpCommand(cfg *Config) error {
 	return nil
 }
 
-func handleExitCommand(cfg *Config) error {
-	fmt.Println("Closing the Pokedex... Goodbye!")
-	os.Exit(0)
-
-	return nil
-}
-
-// endpoint: https://pokeapi.co/api/v2/location/
-
-func handleMapCommand(cfg *Config) error {
-	requestUrl := "https://pokeapi.co/api/v2/location-area/"
+func handleMapCommand(cfg *Config, args ...string) error {
+	requestUrl := baseUrl
 
 	if cfg.next != nil {
 		requestUrl = *cfg.next
@@ -42,6 +43,7 @@ func handleMapCommand(cfg *Config) error {
 	cfg.next = locationApiResponse.Next
 	cfg.previous = locationApiResponse.Previous
 
+	fmt.Println("Found areas")
 	for _, location := range locationApiResponse.Results {
 		fmt.Println(location.Name)
 	}
@@ -49,7 +51,7 @@ func handleMapCommand(cfg *Config) error {
 	return nil
 }
 
-func handleMapbCommand(cfg *Config) error {
+func handleMapbCommand(cfg *Config, args ...string) error {
 	if cfg.previous == nil {
 		return nil
 	}
@@ -69,4 +71,24 @@ func handleMapbCommand(cfg *Config) error {
 
 	return nil
 
+}
+
+func handleExploreCommand(cfg *Config, args ...string) error {
+	if len(args) != 1 {
+		return errors.New("you must provide a location name")
+	}
+
+	name := args[0]
+	reqUrl := baseUrl + name
+	location, err := cfg.pokeApiClient.GetLocationArea(&reqUrl)
+	if err != nil {
+		return err
+	}
+
+	fmt.Printf("Exploring %s...\n", location.Name)
+	fmt.Println("Found Pokemon: ")
+	for _, enc := range location.PokemonEncounters {
+		fmt.Printf(" - %s\n", enc.Pokemon.Name)
+	}
+	return nil
 }

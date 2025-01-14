@@ -2,13 +2,16 @@ package pokeapi
 
 import (
 	"encoding/json"
+	"fmt"
 	"io"
 	"net/http"
+	"time"
 )
 
 func (c *Client) GetLocationAreas(requestUrl *string) (RespLocationAreas, error) {
 
 	if val, ok := c.cache.Get(*requestUrl); ok {
+		fmt.Println("Using cache..")
 		locationsResp := RespLocationAreas{}
 		err := json.Unmarshal(val, &locationsResp)
 		if err != nil {
@@ -18,6 +21,7 @@ func (c *Client) GetLocationAreas(requestUrl *string) (RespLocationAreas, error)
 		return locationsResp, nil
 	}
 
+	time.Sleep(2 * time.Second)
 	req, err := http.NewRequest("GET", *requestUrl, nil)
 	if err != nil {
 		return RespLocationAreas{}, err
