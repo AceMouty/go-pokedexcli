@@ -11,7 +11,10 @@ type Config struct {
 	pokeApiClient pokeapi.Client
 	next          *string
 	previous      *string
+	pokedex       Pokedex
 }
+
+type Pokedex = map[string]pokeapi.Pokemon
 
 func main() {
 	scanner := bufio.NewScanner(os.Stdin)
@@ -20,7 +23,7 @@ func main() {
 	cacheInterval := 5 * time.Minute
 
 	apiClient := pokeapi.NewClient(httpTimeoutDuration, cacheInterval)
-	cfg := Config{pokeApiClient: apiClient}
+	cfg := Config{pokeApiClient: apiClient, pokedex: Pokedex{}}
 
 	startRepl(scanner, &cfg)
 }

@@ -107,5 +107,23 @@ func getCommands() commandMap {
 		callback:    handleExploreCommand,
 	}
 
+	commands["catch"] = cliCommand{
+		name:        "catch <pokemon_name>",
+		description: "Attempt to catch a pokemon",
+		callback:    handleCatchCommand,
+	}
+
+	commands["inspect"] = cliCommand{
+		name:        "inspect <pokemon_name>",
+		description: "Display information about a specific pokemon",
+		callback:    handleInspectCommand,
+	}
+
+	commands["pokedex"] = cliCommand{
+		name:        "pokedex",
+		description: "Display names of all pokemon caught",
+		callback:    handlePokedexCommand,
+	}
+
 	return commands
 }

@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"io"
 	"net/http"
-	"time"
 )
 
 func (c *Client) GetLocationArea(requestUrl *string) (Location, error) {
@@ -18,7 +17,6 @@ func (c *Client) GetLocationArea(requestUrl *string) (Location, error) {
 		return locationResp, nil
 	}
 
-	time.Sleep(2 * time.Second)
 	req, err := http.NewRequest("GET", *requestUrl, nil)
 	if err != nil {
 		return Location{}, err

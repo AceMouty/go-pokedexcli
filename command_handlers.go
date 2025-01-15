@@ -3,6 +3,7 @@ package main
 import (
 	"errors"
 	"fmt"
+	"math/rand"
 	"os"
 )
 
@@ -23,7 +24,6 @@ func handleHelpCommand(cfg *Config, args ...string) error {
 		fmt.Println(message)
 	}
 	fmt.Print("\n\n")
-
 	return nil
 }
 
@@ -89,6 +89,63 @@ func handleExploreCommand(cfg *Config, args ...string) error {
 	fmt.Println("Found Pokemon: ")
 	for _, enc := range location.PokemonEncounters {
 		fmt.Printf(" - %s\n", enc.Pokemon.Name)
+	}
+	return nil
+}
+
+func handleCatchCommand(cfg *Config, args ...string) error {
+	pokemonName := args[0]
+	fmt.Printf("Throwing a Pokeball at %v...\n", pokemonName)
+
+	pokemon, err := cfg.pokeApiClient.GetPokemon(&pokemonName)
+
+	if err != nil {
+		return err
+	}
+
+	maxCatchRate := 100
+	catchRate := maxCatchRate - pokemon.BaseExperience/5
+	randomNum := rand.Intn(maxCatchRate)
+	catchPokemon := randomNum < catchRate
+
+	if catchPokemon {
+		fmt.Printf("%v was caught!\n", pokemonName)
+		cfg.pokedex[pokemonName] = pokemon
+	} else {
+		fmt.Printf("%v escaped!\n", pokemonName)
+	}
+
+	return nil
+}
+
+func handleInspectCommand(cfg *Config, args ...string) error {
+
+	pokemonName := args[0]
+	pokemon, ok := cfg.pokedex[pokemonName]
+	if !ok {
+		fmt.Println("no")
+	}
+
+	fmt.Println("Name:", pokemon.Name)
+	fmt.Println("Height:", pokemon.Height)
+	fmt.Println("Weight:", pokemon.Weight)
+
+	fmt.Println("Stats:")
+	for _, stat := range pokemon.Stats {
+		fmt.Printf("  -%v: %v\n", stat.Stat.Name, stat.BaseStat)
+	}
+
+	fmt.Println("Types:")
+	for _, t := range pokemon.Types {
+		fmt.Printf("  - %v\n", t.Type.Name)
+	}
+
+	return nil
+}
+
+func handlePokedexCommand(cfg *Config, args ...string) error {
+	for _, pokemon := range cfg.pokedex {
+		fmt.Printf("- %v\n", pokemon.Name)
 	}
 	return nil
 }
